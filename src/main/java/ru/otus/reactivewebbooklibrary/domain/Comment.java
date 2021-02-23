@@ -15,21 +15,20 @@ public class Comment {
     @Field("book")
     private Book book;
 
-    //TODO: Check for necessity
     public Comment() {
     }
 
     public Comment(String content, String bookTitle) {
         this.content = content;
         this.book = new Book();
-        this.book.setTitle(bookTitle);
+        this.book = this.book.setTitle(bookTitle);
     }
 
     public Comment(String id, String content, String bookTitle) {
         this.id = id;
         this.content = content;
         this.book = new Book();
-        this.book.setTitle(bookTitle);
+        this.book = this.book.setTitle(bookTitle);
     }
 
     public String getId() {
@@ -42,11 +41,6 @@ public class Comment {
 
     public Book getBook() {
         return book;
-    }
-
-    //TODO: Check for necessity
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Comment setContent(String content) {

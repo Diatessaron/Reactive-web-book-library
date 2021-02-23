@@ -8,4 +8,4 @@ mongock:
   enabled: false
   runner-type: "InitializingBean"
   change-logs-scan-package:
-    - ru.otus.homework3.mongock.changelog
+    - ru.otus.reactivewebbooklibrary.mongock.changelog

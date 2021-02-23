@@ -17,7 +17,6 @@ public class Book {
     @Field("genre")
     private Genre genre;
 
-    //TODO: Check for necessity
     public Book() {
     }
 
@@ -48,11 +47,6 @@ public class Book {
 
     public Genre getGenre() {
         return genre;
-    }
-
-    //TODO: Check for necessity
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Book setTitle(String title) {

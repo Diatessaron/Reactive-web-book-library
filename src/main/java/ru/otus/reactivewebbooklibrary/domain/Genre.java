@@ -13,7 +13,6 @@ public class Genre {
     @Field("name")
     private String name;
 
-    //TODO: Check for necessity
     public Genre() {
     }
 
@@ -32,11 +31,6 @@ public class Genre {
 
     public String getName() {
         return name;
-    }
-
-    //TODO: Check for necessity
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Genre setName(String name) {

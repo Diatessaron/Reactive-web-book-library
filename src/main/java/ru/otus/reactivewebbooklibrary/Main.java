@@ -1,11 +1,10 @@
 package ru.otus.reactivewebbooklibrary;
 
-import com.github.cloudyrock.spring.v5.EnableMongock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@EnableMongock
+//@EnableMongock
 public class Main {
 
     public static void main(String[] args) {

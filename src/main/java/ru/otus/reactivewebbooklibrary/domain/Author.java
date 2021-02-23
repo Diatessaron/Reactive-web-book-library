@@ -13,7 +13,6 @@ public class Author {
     @Field("name")
     private String name;
 
-    //TODO: Check for necessity
     public Author() {
     }
 
@@ -32,11 +31,6 @@ public class Author {
 
     public String getName() {
         return name;
-    }
-
-    //TODO: Check for necessity
-    public void setId(String id) {
-        this.id = id;
     }
 
     public Author setName(String name) {
