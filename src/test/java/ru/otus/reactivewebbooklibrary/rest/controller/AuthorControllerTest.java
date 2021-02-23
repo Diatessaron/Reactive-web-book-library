@@ -1,40 +1,88 @@
 package ru.otus.reactivewebbooklibrary.rest.controller;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import ru.otus.reactivewebbooklibrary.domain.Author;
+import ru.otus.reactivewebbooklibrary.rest.dto.AuthorRequest;
+import ru.otus.reactivewebbooklibrary.service.AuthorService;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.nio.charset.StandardCharsets;
 
-@SpringBootTest
+import static org.mockito.Mockito.when;
+
+@WebFluxTest(controllers = AuthorController.class)
 class AuthorControllerTest {
+    @Autowired
+    private WebTestClient client;
+
+    @MockBean
+    private AuthorService authorService;
+
+    private static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
+            MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
 
     @Test
-    void create() {
+    void testCreateByStatus() {
+        AuthorRequest authorRequest = new AuthorRequest();
+        authorRequest.setAuthor("Author");
 
+        client.post().uri("/api/authors").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(authorRequest)).exchange()
+                .expectStatus().isOk();
     }
 
     @Test
-    void getAuthorById() {
+    void testGetAuthorByIdByStatus() {
+        when(authorService.getAuthorById("id")).thenReturn(Mono.just(new Author("Author")));
 
+        client.get().uri(uriBuilder -> uriBuilder.path("/api/authors/id").queryParam("id", "id").build())
+                .exchange().expectStatus().isOk();
     }
 
     @Test
-    void getAuthorByName() {
+    void testGetAuthorByNameByStatus() {
+        when(authorService.getAuthorsByName("Author")).thenReturn(Flux.just(new Author("Author")));
 
+        client.get().uri("/api/authors/Author").exchange().expectStatus().isOk();
     }
 
     @Test
-    void getAll() {
+    void testGetAllByStatus() {
+        when(authorService.getAll()).thenReturn(Flux.just(new Author("James Joyce"),
+                new Author("Author")));
 
+        client.get().uri("/api/authors").exchange().expectStatus().isOk();
     }
 
     @Test
-    void edit() {
+    void testEditByStatus() {
+        when(authorService.updateAuthor("id", "Author"))
+                .thenReturn(Mono.just(new Author("New Author")));
 
+        AuthorRequest authorRequest = new AuthorRequest();
+        authorRequest.setId("id");
+        authorRequest.setAuthor("Author");
+
+        client.put().uri("/api/authors").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(authorRequest)).exchange()
+                .expectStatus().isOk();
     }
 
     @Test
-    void deleteById() {
+    void testDeleteByIdByStatus() {
+        AuthorRequest authorRequest = new AuthorRequest();
+        authorRequest.setId("id");
 
+        client.method(HttpMethod.DELETE).uri("/api/authors")
+                .body(BodyInserters.fromObject(authorRequest)).exchange()
+                .expectStatus().isOk();
     }
 }
