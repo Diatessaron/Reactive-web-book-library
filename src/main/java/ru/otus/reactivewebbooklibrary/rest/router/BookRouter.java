@@ -15,12 +15,12 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 public class BookRouter {
     @Bean
     public RouterFunction<ServerResponse> bookPagesRouter(@Value("classpath:/static/bookByComment.html") Resource bookByCommentHtml,
-                                                      @Value("classpath:/static/bookById.html") Resource bookByIdHtml,
-                                                      @Value("classpath:/static/bookEdit.html") Resource bookEditHtml,
-                                                      @Value("classpath:/static/bookList.html") Resource bookListHtml,
-                                                      @Value("classpath:/static/bookSave.html") Resource bookSaveHtml,
-                                                      @Value("classpath:/static/booksByAuthor.html") Resource booksByAuthorHtml,
-                                                      @Value("classpath:/static/booksByGenre.html") Resource booksByGenreHtml) {
+                                                          @Value("classpath:/static/bookById.html") Resource bookByIdHtml,
+                                                          @Value("classpath:/static/bookEdit.html") Resource bookEditHtml,
+                                                          @Value("classpath:/static/bookList.html") Resource bookListHtml,
+                                                          @Value("classpath:/static/bookSave.html") Resource bookSaveHtml,
+                                                          @Value("classpath:/static/booksByAuthor.html") Resource booksByAuthorHtml,
+                                                          @Value("classpath:/static/booksByGenre.html") Resource booksByGenreHtml) {
         return route()
                 .GET("/books/add", request -> ok().contentType(MediaType.TEXT_HTML).bodyValue(bookSaveHtml))
                 .GET("/books/id", request -> ok().contentType(MediaType.TEXT_HTML).bodyValue(bookByIdHtml))

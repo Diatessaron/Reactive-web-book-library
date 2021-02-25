@@ -25,9 +25,11 @@
 
 <header class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
     <input onclick="window.history.go(-1); return false;" type="submit" value="Previous page" style="margin: 15px;"/>
-    <a href="index.html" class="h5 my-0 me-md-auto fw-normal">Main page</a>
+    <a onclick="window.location = '/'; return false" href="index.html" class="h5 my-0 me-md-auto fw-normal">Main
+        page</a>
     <nav class="my-2 my-md-0 me-md-3">
-        <a href="commentSave.html" class="btn btn-outline-primary">Add comment</a>
+        <a onclick="window.location = '/comments/add'; return false" href="commentSave.html"
+           class="btn btn-outline-primary">Add comment</a>
     </nav>
 </header>
 
@@ -59,7 +61,7 @@
         window.location.reload();
     }
 
-    const book = /*[[${comments[0].book.title}]]*/ '';
+    const book = window.location.href.substring(window.location.href.lastIndexOf('/') + 1)
 
     $(function () {
         $.get('/api/comments/book/' + book).done(function (comments) {

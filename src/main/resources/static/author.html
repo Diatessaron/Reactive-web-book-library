@@ -40,6 +40,7 @@
 
 <script>
     const author = window.location.href.substring(window.location.href.lastIndexOf('=') + 1)
+
     $(function () {
         $.get('/api/authors/id?id=' + author).done(function (author) {
             $('tbody').append(`

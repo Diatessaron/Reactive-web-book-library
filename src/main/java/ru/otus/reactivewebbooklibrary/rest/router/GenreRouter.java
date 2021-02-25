@@ -15,9 +15,9 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
 public class GenreRouter {
     @Bean
     public RouterFunction<ServerResponse> genrePagesRouter(@Value("classpath:/static/genre.html") Resource genreHtml,
-                                                      @Value("classpath:/static/genreEdit.html") Resource genreEditHtml,
-                                                      @Value("classpath:/static/genreSave.html") Resource genreSaveHtml,
-                                                      @Value("classpath:/static/genreList.html") Resource genreListHtml) {
+                                                           @Value("classpath:/static/genreEdit.html") Resource genreEditHtml,
+                                                           @Value("classpath:/static/genreSave.html") Resource genreSaveHtml,
+                                                           @Value("classpath:/static/genreList.html") Resource genreListHtml) {
         return route()
                 .GET("/genres/add", request -> ok().contentType(MediaType.TEXT_HTML).bodyValue(genreSaveHtml))
                 .GET("/genres/id", request -> ok().contentType(MediaType.TEXT_HTML).bodyValue(genreHtml))

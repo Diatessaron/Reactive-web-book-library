@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
+import ru.otus.reactivewebbooklibrary.domain.Book;
 import ru.otus.reactivewebbooklibrary.domain.Genre;
 import ru.otus.reactivewebbooklibrary.repository.BookRepository;
 import ru.otus.reactivewebbooklibrary.repository.GenreRepository;
@@ -43,19 +44,16 @@ public class GenreServiceImpl implements GenreService {
         return genreRepository.findAll();
     }
 
-    //TODO: Check book update
     @Transactional
     @Override
-    public Mono<Genre> updateGenre(String id, String name) {
+    public Mono<Tuple2<Flux<Book>, Genre>> updateGenre(String id, String name) {
         return genreRepository.findById(id)
-                .flatMap(g -> {
-                    bookRepository.findByGenre_Id(g.getId())
-                            .flatMap(b -> bookRepository.save(b.setGenre(g.setName(name))));
-                    return Mono.just(g.setName(name));
-                }).flatMap(genreRepository::save);
+                .map(g -> bookRepository.findByGenre_Id(g.getId())
+                        .flatMap(b -> Mono.just(b.setGenre(g.setName(name)))).flatMap(bookRepository::save))
+                .zipWith(genreRepository.findById(id).flatMap(g -> Mono.just(g.setName(name)))
+                        .flatMap(genreRepository::save));
     }
 
-    //TODO: Check book delete
     @Transactional
     @Override
     public Mono<Tuple2<Void, Void>> deleteGenre(String id) {

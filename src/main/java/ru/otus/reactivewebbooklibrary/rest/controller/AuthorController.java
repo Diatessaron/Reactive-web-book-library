@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Author;
+import ru.otus.reactivewebbooklibrary.domain.Book;
 import ru.otus.reactivewebbooklibrary.rest.dto.AuthorRequest;
 import ru.otus.reactivewebbooklibrary.service.AuthorService;
 
@@ -41,7 +42,7 @@ public class AuthorController {
 
     @PutMapping(value = "/api/authors",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Author> edit(@Validated @RequestBody AuthorRequest authorRequest) {
+    public Mono<Tuple2<Flux<Book>, Author>> edit(@Validated @RequestBody AuthorRequest authorRequest) {
         return authorService.updateAuthor(authorRequest.getId(), authorRequest.getAuthor());
     }
 

@@ -37,7 +37,7 @@
 
 <script>
     document.getElementById('button').onclick = function () {
-        const id = window.location.href.substring(window.location.href.lastIndexOf('=')+1)
+        const id = window.location.href.substring(window.location.href.lastIndexOf('=') + 1)
         const value = document.getElementById('input').value;
 
         $.ajax({

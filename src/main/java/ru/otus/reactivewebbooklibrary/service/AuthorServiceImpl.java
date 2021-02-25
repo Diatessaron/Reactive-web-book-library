@@ -6,6 +6,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Author;
+import ru.otus.reactivewebbooklibrary.domain.Book;
 import ru.otus.reactivewebbooklibrary.repository.AuthorRepository;
 import ru.otus.reactivewebbooklibrary.repository.BookRepository;
 
@@ -43,20 +44,16 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.findAll();
     }
 
-    //TODO: Check book update
     @Transactional
     @Override
-    public Mono<Author> updateAuthor(String id, String name) {
+    public Mono<Tuple2<Flux<Book>, Author>> updateAuthor(String id, String name) {
         return authorRepository.findById(id)
-                .flatMap(a -> {
-                    bookRepository.findByAuthor_Id(a.getId()).flatMap
-                            (b -> bookRepository.save(b.setAuthor(a.setName(name))));
-                    return Mono.just(a.setName(name));
-                })
-                .flatMap(authorRepository::save);
+                .map(a -> bookRepository.findByAuthor_Id(a.getId())
+                        .flatMap(b -> Mono.just(b.setAuthor(a.setName(name)))).flatMap(bookRepository::save))
+                .zipWith(authorRepository.findById(id).flatMap(a -> Mono.just(a.setName(name)))
+                        .flatMap(authorRepository::save));
     }
 
-    //TODO: Check book delete
     @Transactional
     @Override
     public Mono<Tuple2<Void, Void>> deleteAuthor(String id) {

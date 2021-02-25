@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Author;
 import ru.otus.reactivewebbooklibrary.domain.Book;
+import ru.otus.reactivewebbooklibrary.domain.Comment;
 import ru.otus.reactivewebbooklibrary.domain.Genre;
 import ru.otus.reactivewebbooklibrary.repository.AuthorRepository;
 import ru.otus.reactivewebbooklibrary.repository.BookRepository;
@@ -79,25 +80,20 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAll();
     }
 
-    //TODO: Check comment update
     @Transactional
     @Override
-    public Mono<Book> updateBook(String id, String title, String authorNameParameter,
-                                 String genreNameParameter) {
+    public Mono<Tuple2<Flux<Comment>, Book>> updateBook(String id, String title, String authorNameParameter,
+                                                        String genreNameParameter) {
         return bookRepository.findById(id)
-                .flatMap(b -> {
-                    commentRepository.saveAll(commentRepository.findByBook_Title(b.getTitle())
-                            .flatMap(c -> Mono.just(c.setBook(title))));
-                    return getAuthor(authorNameParameter)
+                .map(b -> commentRepository.saveAll(commentRepository.findByBook_Title(b.getTitle())
+                        .flatMap(c -> Mono.just(c.setBook(title)))))
+                .zipWith(bookRepository.findById(id).flatMap(b -> getAuthor(authorNameParameter)
                             .flatMap(a -> Mono.just(b.setAuthor(a)))
                             .flatMap(book -> Mono.just(book.setTitle(title)))
                             .flatMap(book -> getGenre(genreNameParameter)
-                                    .flatMap(g -> Mono.just(book.setGenre(g))));
-                })
-                .flatMap(bookRepository::save);
+                                    .flatMap(g -> Mono.just(book.setGenre(g))))));
     }
 
-    //TODO: Check comment delete
     @Transactional
     @Override
     public Mono<Tuple2<Void, Void>> deleteBook(String id) {

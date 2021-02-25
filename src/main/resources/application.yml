@@ -4,8 +4,3 @@ spring:
       host: localhost
       port: 27017
       database: library
-
-mongock:
-  runner-type: "InitializingBean"
-  change-logs-scan-package:
-    - ru.otus.reactivewebbooklibrary.mongock.changelog

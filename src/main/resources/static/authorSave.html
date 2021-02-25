@@ -28,7 +28,8 @@
 
 <header class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
     <input onclick="window.history.go(-1); return false;" type="submit" value="Previous page" style="margin: 15px;"/>
-    <a onclick="window.location = '/'; return false" href="index.html" class="h5 my-0 me-md-auto fw-normal">Main page</a>
+    <a onclick="window.location = '/'; return false" href="index.html" class="h5 my-0 me-md-auto fw-normal">Main
+        page</a>
 </header>
 
 <form>
@@ -44,6 +45,7 @@
 <script>
     document.getElementById('button').onclick = function () {
         const value = document.getElementById('input').value;
+
         $.ajax({
             url: '/api/authors',
             method: 'post',

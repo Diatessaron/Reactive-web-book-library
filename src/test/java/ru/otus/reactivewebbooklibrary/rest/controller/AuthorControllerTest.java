@@ -64,9 +64,6 @@ class AuthorControllerTest {
 
     @Test
     void testEditByStatus() {
-        when(authorService.updateAuthor("id", "Author"))
-                .thenReturn(Mono.just(new Author("New Author")));
-
         AuthorRequest authorRequest = new AuthorRequest();
         authorRequest.setId("id");
         authorRequest.setAuthor("Author");

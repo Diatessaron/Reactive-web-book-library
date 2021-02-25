@@ -7,6 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Author;
 import ru.otus.reactivewebbooklibrary.domain.Book;
 import ru.otus.reactivewebbooklibrary.domain.Genre;
@@ -86,13 +88,14 @@ class GenreServiceImplTest {
         when(genreRepository.save(genre)).thenReturn(Mono.just(genre));
         when(bookRepository.findByGenre_Id(expectedNovel.getId())).thenReturn(Flux.just(book));
 
-        final Genre actualGenre = service.updateGenre("Modernist novel", "Genre").block();
+        final Mono<Tuple2<Flux<Book>, Genre>> source = service.updateGenre("Modernist novel", "Genre");
+        final Genre actualGenre = source.block().getT2();
 
         assertThat(actualGenre).isNotNull().matches(s -> !s.getName().isBlank())
                 .matches(s -> s.getName().equals("Genre"));
 
         final InOrder inOrder = inOrder(genreRepository, bookRepository);
-        inOrder.verify(genreRepository).findById("Modernist novel");
+        inOrder.verify(genreRepository, times(2)).findById("Modernist novel");
         inOrder.verify(bookRepository).findByGenre_Id(genre.getId());
         inOrder.verify(genreRepository).save(genre);
     }
