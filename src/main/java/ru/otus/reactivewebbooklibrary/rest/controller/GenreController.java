@@ -1,6 +1,8 @@
 package ru.otus.reactivewebbooklibrary.rest.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -21,18 +23,31 @@ public class GenreController {
 
     @PostMapping(value = "/api/genres",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Genre> create(@Validated @RequestBody GenreRequest genreRequest) {
-        return genreService.saveGenre(genreRequest.getGenre());
+    public ResponseEntity<Mono<Genre>> create(@Validated @RequestBody GenreRequest genreRequest) {
+        if (genreRequest.getGenre() == null || genreRequest.getGenre().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(genreService.saveGenre(genreRequest.getGenre()));
     }
 
     @GetMapping("/api/genres/id")
-    public Mono<Genre> getGenreById(@RequestParam String id){
-        return genreService.getGenreById(id);
+    public ResponseEntity<Mono<Genre>> getGenreById(@RequestParam String id) {
+        final Mono<Genre> genre = genreService.getGenreById(id);
+
+        if (genre.hasElement().equals(Mono.just(false)))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(genre);
     }
 
     @GetMapping("/api/genres/{genre}")
-    public Mono<Genre> getGenreByName(@PathVariable String genre) {
-        return genreService.getGenreByName(genre);
+    public ResponseEntity<Mono<Genre>> getGenreByName(@PathVariable String genre) {
+        final Mono<Genre> result = genreService.getGenreByName(genre);
+
+        if (result.hasElement().equals(Mono.just(false)))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
     @GetMapping("/api/genres")
@@ -42,13 +57,21 @@ public class GenreController {
 
     @PutMapping(value = "/api/genres",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public  Mono<Tuple2<Flux<Book>, Genre>> edit(@Validated @RequestBody GenreRequest genreRequest) {
-        return genreService.updateGenre(genreRequest.getId(), genreRequest.getGenre());
+    public ResponseEntity<Flux<Tuple2<Book, Genre>>> edit(@Validated @RequestBody GenreRequest genreRequest) {
+        if (genreRequest.getId() == null || genreRequest.getGenre() == null ||
+                genreRequest.getId().isBlank() || genreRequest.getGenre().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(genreService.updateGenre(genreRequest.getId(),
+                    genreRequest.getGenre()));
     }
 
     @DeleteMapping(value = "/api/genres",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Tuple2<Void, Void>> deleteByName(@Validated @RequestBody GenreRequest genreRequest) {
-        return genreService.deleteGenre(genreRequest.getId());
+    public ResponseEntity<Mono<Tuple2<Void, Void>>> deleteByName(@Validated @RequestBody GenreRequest genreRequest) {
+        if (genreRequest.getId() == null || genreRequest.getId().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(genreService.deleteGenre(genreRequest.getId()));
     }
 }

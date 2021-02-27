@@ -46,12 +46,16 @@ public class GenreServiceImpl implements GenreService {
 
     @Transactional
     @Override
-    public Mono<Tuple2<Flux<Book>, Genre>> updateGenre(String id, String name) {
-        return genreRepository.findById(id)
-                .map(g -> bookRepository.findByGenre_Id(g.getId())
-                        .flatMap(b -> Mono.just(b.setGenre(g.setName(name)))).flatMap(bookRepository::save))
-                .zipWith(genreRepository.findById(id).flatMap(g -> Mono.just(g.setName(name)))
-                        .flatMap(genreRepository::save));
+    public Flux<Tuple2<Book, Genre>> updateGenre(String id, String name) {
+        final Flux<Book> bookSave = bookRepository.findByGenre_Id(id).flatMap
+                (b -> genreRepository.findById(id).flatMap(g -> Mono.just(b.setGenre(g.setName(name)))))
+                .flatMap(bookRepository::save);
+
+        final Mono<Genre> genreSave = genreRepository.findById(id).flatMap(g -> Mono.just(g.setName(name)))
+                .flatMap(genreRepository::save);
+
+        return bookSave
+                .zipWith(genreSave);
     }
 
     @Transactional

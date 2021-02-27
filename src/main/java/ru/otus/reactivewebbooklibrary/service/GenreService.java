@@ -15,7 +15,7 @@ public interface GenreService {
 
     Flux<Genre> getAll();
 
-    Mono<Tuple2<Flux<Book>, Genre>> updateGenre(String id, String name);
+    Flux<Tuple2<Book, Genre>> updateGenre(String id, String name);
 
     Mono<Tuple2<Void, Void>> deleteGenre(String id);
 }

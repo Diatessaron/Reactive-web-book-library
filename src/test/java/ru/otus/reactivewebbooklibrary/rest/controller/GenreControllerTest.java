@@ -40,11 +40,26 @@ class GenreControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectSaveRequest() {
+        final GenreRequest genreRequest = new GenreRequest();
+
+        client.post().uri("/api/genres").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(genreRequest)).exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testGetGenreByIdByStatus() {
-        when(genreService.getGenreById("Id")).thenReturn(Mono.just(new Genre("Genre")));
+        when(genreService.getGenreById("id")).thenReturn(Mono.just(new Genre("Genre")));
 
         client.get().uri(uriBuilder -> uriBuilder.path("/api/genres/id").queryParam("id", "id").build())
                 .exchange().expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByIdRequest() {
+        client.get().uri(uriBuilder -> uriBuilder.path("/api/genres/id").queryParam("id", "id").build())
+                .exchange().expectStatus().is4xxClientError();
     }
 
     @Test
@@ -52,6 +67,11 @@ class GenreControllerTest {
         when(genreService.getGenreByName("Genre")).thenReturn(Mono.just(new Genre("Genre")));
 
         client.get().uri("/api/genres/Genre").exchange().expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByNameRequest() {
+        client.get().uri("/api/genres/Genre").exchange().expectStatus().is4xxClientError();
     }
 
     @Test
@@ -73,6 +93,15 @@ class GenreControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectEditRequest() {
+        final GenreRequest genreRequest = new GenreRequest();
+
+        client.put().uri("/api/genres").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(genreRequest)).exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testDeleteByNameByStatus() {
         GenreRequest genreRequest = new GenreRequest();
         genreRequest.setId("id");
@@ -80,5 +109,14 @@ class GenreControllerTest {
         client.method(HttpMethod.DELETE).uri("/api/genres")
                 .body(BodyInserters.fromObject(genreRequest)).exchange()
                 .expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectDeleteRequest() {
+        final GenreRequest genreRequest = new GenreRequest();
+
+        client.method(HttpMethod.DELETE).uri("/api/genres")
+                .body(BodyInserters.fromObject(genreRequest)).exchange()
+                .expectStatus().is4xxClientError();
     }
 }

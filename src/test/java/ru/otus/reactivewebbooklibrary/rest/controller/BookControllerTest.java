@@ -18,7 +18,6 @@ import ru.otus.reactivewebbooklibrary.service.BookService;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(controllers = BookController.class)
@@ -48,12 +47,27 @@ class BookControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectCreateRequest() {
+        final BookRequest bookRequest = new BookRequest();
+
+        client.post().uri("/api/books").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(bookRequest)).exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testGetBookByIdByStatus() {
         when(bookService.getBookById("Book")).thenReturn(Mono.just(new Book("Book", new Author("Author"),
                 new Genre("Genre"))));
 
         client.get().uri(uriBuilder -> uriBuilder.path("/api/books/id").queryParam("id", "Book").build())
                 .exchange().expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByIdRequest() {
+        client.get().uri(uriBuilder -> uriBuilder.path("/api/books/id").queryParam("id", "id").build())
+                .exchange().expectStatus().is4xxClientError();
     }
 
     @Test
@@ -66,6 +80,12 @@ class BookControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByTitleRequest() {
+        client.get().uri("/api/books/title/Book").exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testGetBookByAuthorByStatus() {
         when(bookService.getBookByAuthor("Author")).thenReturn(Flux.just(new Book("Book", new Author("Author"),
                 new Genre("Genre"))));
@@ -75,12 +95,24 @@ class BookControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByAuthorRequest() {
+        client.get().uri("/api/books/author/Author").exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testGetBookByGenreByStatus() {
         when(bookService.getBookByGenre("Genre")).thenReturn(Flux.just(new Book("Book", new Author("Author"),
                 new Genre("Genre"))));
 
         client.get().uri("/api/books/genre/Genre").exchange()
                 .expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByGenreRequest() {
+        client.get().uri("/api/books/genre/Genre").exchange()
+                .expectStatus().is4xxClientError();
     }
 
     @Test
@@ -101,7 +133,7 @@ class BookControllerTest {
 
         final BookRequest bookRequest = new BookRequest();
         bookRequest.setId("id");
-        ;
+
         bookRequest.setTitle("Book");
         bookRequest.setAuthorName("Author");
         bookRequest.setGenreName("Genre");
@@ -112,6 +144,15 @@ class BookControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectEditRequest() {
+        final BookRequest bookRequest = new BookRequest();
+
+        client.put().uri("/api/books").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(bookRequest))
+                .exchange().expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testDeleteByTitleByStatus() {
         final BookRequest bookRequest = new BookRequest();
         bookRequest.setId("id");
@@ -119,5 +160,14 @@ class BookControllerTest {
         client.method(HttpMethod.DELETE).uri("/api/books")
                 .body(BodyInserters.fromObject(bookRequest)).exchange()
                 .expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectDeleteRequest() {
+        final BookRequest bookRequest = new BookRequest();
+
+        client.method(HttpMethod.DELETE).uri("/api/books")
+                .body(BodyInserters.fromObject(bookRequest)).exchange()
+                .expectStatus().is4xxClientError();
     }
 }

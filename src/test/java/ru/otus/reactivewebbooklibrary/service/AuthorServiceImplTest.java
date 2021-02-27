@@ -63,19 +63,19 @@ class AuthorServiceImplTest {
         final Author author = new Author("Author");
         final Book book = new Book("Book", jamesJoyce, new Genre("Modernist novel"));
 
-        when(authorRepository.findById(jamesJoyce.getName())).thenReturn(Mono.just(jamesJoyce));
+        when(authorRepository.findById(jamesJoyce.getId())).thenReturn(Mono.just(jamesJoyce));
         when(authorRepository.save(author)).thenReturn(Mono.just(author));
         when(bookRepository.findByAuthor_Id(jamesJoyce.getId())).thenReturn(Flux.just(book));
         when(bookRepository.save(book.setAuthor(author))).thenReturn(Mono.just(book.setAuthor(author)));
 
-        final Author actualAuthor = service.updateAuthor(jamesJoyce.getName(), author.getName()).block().getT2();
+        final Author actualAuthor = service.updateAuthor(jamesJoyce.getId(), author.getName()).blockFirst().getT2();
 
         assertThat(actualAuthor).isNotNull().matches(s -> !s.getName().isBlank())
                 .matches(s -> s.getName().equals(author.getName()));
 
         final InOrder inOrder = inOrder(authorRepository, bookRepository);
-        inOrder.verify(authorRepository, times(2)).findById("James Joyce");
         inOrder.verify(bookRepository).findByAuthor_Id(jamesJoyce.getId());
+        inOrder.verify(authorRepository, times(2)).findById(jamesJoyce.getId());
         inOrder.verify(authorRepository).save(author);
     }
 }

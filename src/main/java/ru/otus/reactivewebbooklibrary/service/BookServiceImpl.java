@@ -82,16 +82,13 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public Mono<Tuple2<Flux<Comment>, Book>> updateBook(String id, String title, String authorNameParameter,
+    public Mono<Book> updateBook(String id, String title, String authorNameParameter,
                                                         String genreNameParameter) {
         return bookRepository.findById(id)
-                .map(b -> commentRepository.saveAll(commentRepository.findByBook_Title(b.getTitle())
-                        .flatMap(c -> Mono.just(c.setBook(title)))))
-                .zipWith(bookRepository.findById(id).flatMap(b -> getAuthor(authorNameParameter)
-                            .flatMap(a -> Mono.just(b.setAuthor(a)))
-                            .flatMap(book -> Mono.just(book.setTitle(title)))
-                            .flatMap(book -> getGenre(genreNameParameter)
-                                    .flatMap(g -> Mono.just(book.setGenre(g))))));
+                .flatMap(b -> Mono.just(b.setTitle(title)))
+                .flatMap(b -> getAuthor(authorNameParameter).flatMap(a -> Mono.just(b.setAuthor(a))))
+                .flatMap(b -> getGenre(genreNameParameter).flatMap(g -> Mono.just(b.setGenre(g))))
+                .flatMap(bookRepository::save);
     }
 
     @Transactional

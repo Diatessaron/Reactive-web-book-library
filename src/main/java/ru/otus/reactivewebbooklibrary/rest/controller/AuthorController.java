@@ -1,6 +1,8 @@
 package ru.otus.reactivewebbooklibrary.rest.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -21,18 +23,31 @@ public class AuthorController {
 
     @PostMapping(value = "/api/authors",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Author> create(@Validated @RequestBody AuthorRequest authorRequest) {
-        return authorService.save(authorRequest.getAuthor());
+    public ResponseEntity<Mono<Author>> create(@Validated @RequestBody AuthorRequest authorRequest) {
+        if (authorRequest.getAuthor() == null || authorRequest.getAuthor().isBlank())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(authorService.save(authorRequest.getAuthor()));
     }
 
     @GetMapping("/api/authors/id")
-    public Mono<Author> getAuthorById(@RequestParam String id) {
-        return authorService.getAuthorById(id);
+    public ResponseEntity<Mono<Author>> getAuthorById(@RequestParam String id) {
+        final Mono<Author> author = authorService.getAuthorById(id);
+
+        if (author.hasElement().equals(Mono.just(false)))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(author);
     }
 
     @GetMapping("/api/authors/{author}")
-    public Flux<Author> getAuthorByName(@PathVariable String author) {
-        return authorService.getAuthorsByName(author);
+    public ResponseEntity<Flux<Author>> getAuthorByName(@PathVariable String author) {
+        final Flux<Author> authors = authorService.getAuthorsByName(author);
+
+        if (authors.hasElements().equals(Mono.just(false)))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(authors);
     }
 
     @GetMapping("/api/authors")
@@ -42,13 +57,23 @@ public class AuthorController {
 
     @PutMapping(value = "/api/authors",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Tuple2<Flux<Book>, Author>> edit(@Validated @RequestBody AuthorRequest authorRequest) {
-        return authorService.updateAuthor(authorRequest.getId(), authorRequest.getAuthor());
+    public ResponseEntity<Flux<Tuple2<Book, Author>>> edit(@Validated @RequestBody AuthorRequest authorRequest) {
+        if (authorRequest.getId() == null || authorRequest.getAuthor() == null
+                || authorRequest.getId().isBlank() || authorRequest.getAuthor().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else {
+            final Flux<Tuple2<Book, Author>> result = authorService
+                    .updateAuthor(authorRequest.getId(), authorRequest.getAuthor());
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        }
     }
 
     @DeleteMapping(value = "/api/authors",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Tuple2<Void, Void>> deleteById(@Validated @RequestBody AuthorRequest authorRequest) {
-        return authorService.deleteAuthor(authorRequest.getId());
+    public ResponseEntity<Mono<Tuple2<Void, Void>>> deleteById(@Validated @RequestBody AuthorRequest authorRequest) {
+        if (authorRequest.getId() == null || authorRequest.getId().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(authorService.deleteAuthor(authorRequest.getId()));
     }
 }

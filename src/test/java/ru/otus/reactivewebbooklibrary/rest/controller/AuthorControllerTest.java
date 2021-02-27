@@ -40,6 +40,15 @@ class AuthorControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectSaveRequest() {
+        final AuthorRequest authorRequest = new AuthorRequest();
+
+        client.post().uri("/api/authors").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(authorRequest)).exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testGetAuthorByIdByStatus() {
         when(authorService.getAuthorById("id")).thenReturn(Mono.just(new Author("Author")));
 
@@ -48,10 +57,21 @@ class AuthorControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByIdRequest() {
+        client.get().uri(uriBuilder -> uriBuilder.path("/api/authors/id").queryParam("id", "id").build())
+                .exchange().expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testGetAuthorByNameByStatus() {
         when(authorService.getAuthorsByName("Author")).thenReturn(Flux.just(new Author("Author")));
 
         client.get().uri("/api/authors/Author").exchange().expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectGetByNameRequest() {
+        client.get().uri("/api/authors/Author").exchange().expectStatus().is4xxClientError();
     }
 
     @Test
@@ -74,6 +94,15 @@ class AuthorControllerTest {
     }
 
     @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectEditRequest() {
+        final AuthorRequest authorRequest = new AuthorRequest();
+
+        client.put().uri("/api/authors").contentType(APPLICATION_JSON_UTF8)
+                .body(BodyInserters.fromObject(authorRequest)).exchange()
+                .expectStatus().is4xxClientError();
+    }
+
+    @Test
     void testDeleteByIdByStatus() {
         AuthorRequest authorRequest = new AuthorRequest();
         authorRequest.setId("id");
@@ -81,5 +110,14 @@ class AuthorControllerTest {
         client.method(HttpMethod.DELETE).uri("/api/authors")
                 .body(BodyInserters.fromObject(authorRequest)).exchange()
                 .expectStatus().isOk();
+    }
+
+    @Test
+    void shouldReturnClientErrorStatusCodeOnIncorrectDeleteRequest() {
+        final AuthorRequest authorRequest = new AuthorRequest();
+
+        client.method(HttpMethod.DELETE).uri("/api/authors")
+                .body(BodyInserters.fromObject(authorRequest)).exchange()
+                .expectStatus().is4xxClientError();
     }
 }

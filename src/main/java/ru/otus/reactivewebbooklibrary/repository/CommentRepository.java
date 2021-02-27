@@ -8,8 +8,6 @@ import ru.otus.reactivewebbooklibrary.domain.Comment;
 public interface CommentRepository extends ReactiveMongoRepository<Comment, String> {
     Flux<Comment> findByContent(String content);
 
-    Flux<Comment> findByBook_Id(String id);
-
     Flux<Comment> findByBook_Title(String bookTitle);
 
     Mono<Void> deleteByContent(String content);

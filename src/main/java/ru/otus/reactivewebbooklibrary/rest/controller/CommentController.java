@@ -1,6 +1,8 @@
 package ru.otus.reactivewebbooklibrary.rest.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -19,23 +21,43 @@ public class CommentController {
 
     @PostMapping(value = "/api/comments",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Comment> save(@Validated @RequestBody CommentRequest commentRequest) {
-        return commentService.saveComment(commentRequest.getBook(), commentRequest.getContent());
+    public ResponseEntity<Mono<Comment>> save(@Validated @RequestBody CommentRequest commentRequest) {
+        if (commentRequest.getBook() == null || commentRequest.getContent() == null ||
+                commentRequest.getBook().isBlank() || commentRequest.getContent().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment
+                    (commentRequest.getBook(), commentRequest.getContent()));
     }
 
     @GetMapping("/api/comments/id")
-    public Mono<Comment> getCommentById(@RequestParam String id){
-        return commentService.getCommentById(id);
+    public ResponseEntity<Mono<Comment>> getCommentById(@RequestParam String id) {
+        final Mono<Comment> comment = commentService.getCommentById(id);
+
+        if(comment.hasElement().equals(Mono.just(false)))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(comment);
     }
 
     @GetMapping("/api/comments/{comment}")
-    public Flux<Comment> getCommentByContent(@PathVariable String comment) {
-        return commentService.getCommentByContent(comment);
+    public ResponseEntity<Flux<Comment>> getCommentByContent(@PathVariable String comment) {
+        final Flux<Comment> comments = commentService.getCommentByContent(comment);
+
+        if(comments.hasElements().equals(Mono.just(false)))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 
     @GetMapping("/api/comments/book/{bookTitle}")
-    public Flux<Comment> getCommentByBookTitle(@PathVariable String bookTitle) {
-        return commentService.getCommentsByBook(bookTitle);
+    public ResponseEntity<Flux<Comment>> getCommentByBookTitle(@PathVariable String bookTitle) {
+        final Flux<Comment> comments = commentService.getCommentsByBook(bookTitle);
+
+        if(comments.hasElements().equals(Mono.just(false)))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(comments);
     }
 
     @GetMapping("/api/comments")
@@ -45,13 +67,21 @@ public class CommentController {
 
     @PutMapping(value = "/api/comments",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Comment> edit(@Validated @RequestBody CommentRequest commentRequest) {
-        return commentService.updateComment(commentRequest.getId(), commentRequest.getContent());
+    public ResponseEntity<Mono<Comment>> edit(@Validated @RequestBody CommentRequest commentRequest) {
+        if(commentRequest.getId() == null || commentRequest.getContent() == null ||
+                commentRequest.getId().isBlank() || commentRequest.getContent().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment
+                    (commentRequest.getId(), commentRequest.getContent()));
     }
 
     @DeleteMapping(value = "/api/comments",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Void> deleteByContent(@Validated @RequestBody CommentRequest commentRequest) {
-        return commentService.deleteComment(commentRequest.getId());
+    public ResponseEntity<Mono<Void>> deleteByContent(@Validated @RequestBody CommentRequest commentRequest) {
+        if(commentRequest.getId() == null || commentRequest.getId().isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else
+            return ResponseEntity.status(HttpStatus.OK).body(commentService.deleteComment(commentRequest.getId()));
     }
 }

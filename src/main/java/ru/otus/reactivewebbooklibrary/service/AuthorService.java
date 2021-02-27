@@ -15,7 +15,7 @@ public interface AuthorService {
 
     Flux<Author> getAll();
 
-    Mono<Tuple2<Flux<Book>, Author>> updateAuthor(String id, String name);
+    Flux<Tuple2<Book, Author>> updateAuthor(String id, String name);
 
     Mono<Tuple2<Void, Void>> deleteAuthor(String id);
 }

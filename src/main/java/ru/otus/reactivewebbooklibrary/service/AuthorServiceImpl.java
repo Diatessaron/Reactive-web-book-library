@@ -46,12 +46,15 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Transactional
     @Override
-    public Mono<Tuple2<Flux<Book>, Author>> updateAuthor(String id, String name) {
-        return authorRepository.findById(id)
-                .map(a -> bookRepository.findByAuthor_Id(a.getId())
-                        .flatMap(b -> Mono.just(b.setAuthor(a.setName(name)))).flatMap(bookRepository::save))
-                .zipWith(authorRepository.findById(id).flatMap(a -> Mono.just(a.setName(name)))
-                        .flatMap(authorRepository::save));
+    public Flux<Tuple2<Book, Author>> updateAuthor(String id, String name) {
+        final Flux<Book> bookSave = bookRepository.findByAuthor_Id(id).flatMap
+                (b -> authorRepository.findById(id).flatMap(a -> Mono.just(b.setAuthor(a.setName(name)))))
+                .flatMap(bookRepository::save);
+
+        final Mono<Author> authorSave = authorRepository.findById(id).flatMap(a -> Mono.just(a.setName(name)))
+                .flatMap(authorRepository::save);
+
+        return bookSave.zipWith(authorSave);
     }
 
     @Transactional
