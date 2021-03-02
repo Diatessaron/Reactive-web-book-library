@@ -57,12 +57,12 @@ public class AuthorController {
 
     @PutMapping(value = "/api/authors",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Flux<Tuple2<Book, Author>>> edit(@Validated @RequestBody AuthorRequest authorRequest) {
+    public ResponseEntity<Mono<Void>> edit(@Validated @RequestBody AuthorRequest authorRequest) {
         if (authorRequest.getId() == null || authorRequest.getAuthor() == null
                 || authorRequest.getId().isBlank() || authorRequest.getAuthor().isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else {
-            final Flux<Tuple2<Book, Author>> result = authorService
+            final Mono<Void> result = authorService
                     .updateAuthor(authorRequest.getId(), authorRequest.getAuthor());
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }
@@ -70,7 +70,7 @@ public class AuthorController {
 
     @DeleteMapping(value = "/api/authors",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Mono<Tuple2<Void, Void>>> deleteById(@Validated @RequestBody AuthorRequest authorRequest) {
+    public ResponseEntity<Mono<Void>> deleteById(@Validated @RequestBody AuthorRequest authorRequest) {
         if (authorRequest.getId() == null || authorRequest.getId().isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else

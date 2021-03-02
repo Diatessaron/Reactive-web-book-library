@@ -57,7 +57,7 @@ public class GenreController {
 
     @PutMapping(value = "/api/genres",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Flux<Tuple2<Book, Genre>>> edit(@Validated @RequestBody GenreRequest genreRequest) {
+    public ResponseEntity<Mono<Void>> edit(@Validated @RequestBody GenreRequest genreRequest) {
         if (genreRequest.getId() == null || genreRequest.getGenre() == null ||
                 genreRequest.getId().isBlank() || genreRequest.getGenre().isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -68,7 +68,7 @@ public class GenreController {
 
     @DeleteMapping(value = "/api/genres",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Mono<Tuple2<Void, Void>>> deleteByName(@Validated @RequestBody GenreRequest genreRequest) {
+    public ResponseEntity<Mono<Void>> deleteByName(@Validated @RequestBody GenreRequest genreRequest) {
         if (genreRequest.getId() == null || genreRequest.getId().isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else

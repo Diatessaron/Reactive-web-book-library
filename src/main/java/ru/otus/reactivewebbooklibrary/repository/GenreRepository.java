@@ -6,6 +6,4 @@ import ru.otus.reactivewebbooklibrary.domain.Genre;
 
 public interface GenreRepository extends ReactiveMongoRepository<Genre, String> {
     Mono<Genre> findByName(String name);
-
-    Mono<Void> deleteByName(String name);
 }

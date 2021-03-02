@@ -82,20 +82,26 @@ public class BookServiceImpl implements BookService {
 
     @Transactional
     @Override
-    public Mono<Book> updateBook(String id, String title, String authorNameParameter,
-                                                        String genreNameParameter) {
-        return bookRepository.findById(id)
-                .flatMap(b -> Mono.just(b.setTitle(title)))
-                .flatMap(b -> getAuthor(authorNameParameter).flatMap(a -> Mono.just(b.setAuthor(a))))
-                .flatMap(b -> getGenre(genreNameParameter).flatMap(g -> Mono.just(b.setGenre(g))))
-                .flatMap(bookRepository::save);
+    public Mono<Void> updateBook(String id, String title, String authorNameParameter,
+                                 String genreNameParameter) {
+        final Mono<Book> bookMono = bookRepository.findById(id);
+
+        final Mono<Void> commentSave = bookMono.flatMap(b -> commentRepository.findByBook_Title(b.getTitle())
+                .map(c -> c.setBook(title))
+                .flatMap(commentRepository::save).then());
+
+        return getGenre(genreNameParameter).zipWith(getAuthor(authorNameParameter))
+                .map(t -> bookMono.map(b -> b.setAuthor(t.getT2()))
+                        .map(b -> b.setGenre(t.getT1())))
+                .flatMap(b -> b.map(book -> book.setTitle(title)))
+                .flatMap(bookRepository::save).zipWith(commentSave).then();
     }
 
     @Transactional
     @Override
-    public Mono<Tuple2<Void, Void>> deleteBook(String id) {
+    public Mono<Void> deleteBook(String id) {
         return bookRepository.findById(id).flatMap(b -> commentRepository.deleteByBook_Title(b.getTitle()))
-                .zipWith(bookRepository.deleteById(id));
+                .zipWith(bookRepository.deleteById(id)).then();
     }
 
     private Mono<Author> getAuthor(String authorName) {

@@ -7,9 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Book;
-import ru.otus.reactivewebbooklibrary.domain.Comment;
 import ru.otus.reactivewebbooklibrary.rest.dto.BookRequest;
 import ru.otus.reactivewebbooklibrary.service.BookService;
 
@@ -24,7 +22,7 @@ public class BookController {
     @PostMapping(value = "/api/books",
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Mono<Book>> save(@Validated @RequestBody BookRequest bookRequest) {
-        if(bookRequest.getTitle() == null || bookRequest.getAuthorName() == null ||
+        if (bookRequest.getTitle() == null || bookRequest.getAuthorName() == null ||
                 bookRequest.getGenreName() == null || bookRequest.getTitle().isBlank() ||
                 bookRequest.getAuthorName().isBlank() || bookRequest.getGenreName().isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -37,7 +35,7 @@ public class BookController {
     public ResponseEntity<Mono<Book>> getBookById(@RequestParam String id) {
         final Mono<Book> book = bookService.getBookById(id);
 
-        if(book.hasElement().equals(Mono.just(false)))
+        if (book.hasElement().equals(Mono.just(false)))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else
             return ResponseEntity.status(HttpStatus.OK).body(book);
@@ -47,7 +45,7 @@ public class BookController {
     public ResponseEntity<Flux<Book>> getBookByTitle(@PathVariable String title) {
         final Flux<Book> book = bookService.getBookByTitle(title);
 
-        if(book.hasElements().equals(Mono.just(false)))
+        if (book.hasElements().equals(Mono.just(false)))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else
             return ResponseEntity.status(HttpStatus.OK).body(book);
@@ -57,7 +55,7 @@ public class BookController {
     public ResponseEntity<Flux<Book>> getBookByAuthor(@PathVariable String author) {
         final Flux<Book> book = bookService.getBookByAuthor(author);
 
-        if(book.hasElements().equals(Mono.just(false)))
+        if (book.hasElements().equals(Mono.just(false)))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else
             return ResponseEntity.status(HttpStatus.OK).body(book);
@@ -67,7 +65,7 @@ public class BookController {
     public ResponseEntity<Flux<Book>> getBookByGenre(@PathVariable String genre) {
         final Flux<Book> books = bookService.getBookByGenre(genre);
 
-        if(books.hasElements().equals(Mono.just(false)))
+        if (books.hasElements().equals(Mono.just(false)))
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else
             return ResponseEntity.status(HttpStatus.OK).body(books);
@@ -80,8 +78,8 @@ public class BookController {
 
     @PutMapping(value = "/api/books",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Mono<Book>> edit(@Validated @RequestBody BookRequest bookRequest) {
-        if(bookRequest.getId() == null || bookRequest.getTitle() == null ||
+    public ResponseEntity<Mono<Void>> edit(@Validated @RequestBody BookRequest bookRequest) {
+        if (bookRequest.getId() == null || bookRequest.getTitle() == null ||
                 bookRequest.getAuthorName() == null || bookRequest.getGenreName() == null ||
                 bookRequest.getId().isBlank() || bookRequest.getTitle().isBlank() ||
                 bookRequest.getAuthorName().isBlank() || bookRequest.getGenreName().isBlank())
@@ -94,8 +92,8 @@ public class BookController {
 
     @DeleteMapping(value = "/api/books",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Mono<Tuple2<Void, Void>>> deleteByTitle(@Validated @RequestBody BookRequest bookRequest) {
-        if(bookRequest.getId() == null || bookRequest.getId().isBlank())
+    public ResponseEntity<Mono<Void>> deleteByTitle(@Validated @RequestBody BookRequest bookRequest) {
+        if (bookRequest.getId() == null || bookRequest.getId().isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         else
             return ResponseEntity.status(HttpStatus.OK).body(bookService.deleteBook(bookRequest.getId()));

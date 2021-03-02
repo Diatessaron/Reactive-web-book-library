@@ -2,7 +2,6 @@ package ru.otus.reactivewebbooklibrary.service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Book;
 
 public interface BookService {
@@ -20,8 +19,8 @@ public interface BookService {
 
     Flux<Book> getAll();
 
-    Mono<Book> updateBook(String id, String title, String authorNameParameter,
-                             String genreNameParameter);
+    Mono<Void> updateBook(String id, String title, String authorNameParameter,
+                          String genreNameParameter);
 
-    Mono<Tuple2<Void, Void>> deleteBook(String id);
+    Mono<Void> deleteBook(String id);
 }

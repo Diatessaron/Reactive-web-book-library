@@ -5,17 +5,14 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.reactivewebbooklibrary.domain.Comment;
-import ru.otus.reactivewebbooklibrary.repository.BookRepository;
 import ru.otus.reactivewebbooklibrary.repository.CommentRepository;
 
 @Service
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
-    private final BookRepository bookRepository;
 
-    public CommentServiceImpl(CommentRepository commentRepository, BookRepository bookRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository) {
         this.commentRepository = commentRepository;
-        this.bookRepository = bookRepository;
     }
 
     @Transactional

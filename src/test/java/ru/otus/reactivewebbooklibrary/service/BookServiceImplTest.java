@@ -133,6 +133,7 @@ class BookServiceImplTest {
 
         when(authorRepository.findByName(author.getName())).thenReturn(Flux.just(author));
         when(genreRepository.findByName(genre.getName())).thenReturn(Mono.just(genre));
+        when(genreRepository.save(genre)).thenReturn(Mono.just(genre));
         when(bookRepository.save(new Book("Discipline and Punish", author, genre)))
                 .thenReturn(Mono.just(book));
         when(bookRepository.findById(book.getTitle())).thenReturn(Mono.just(book));
@@ -158,6 +159,7 @@ class BookServiceImplTest {
 
         when(authorRepository.findByName(author.getName())).thenReturn(Flux.just(author));
         when(genreRepository.findByName(genre.getName())).thenReturn(Mono.just(genre));
+        when(genreRepository.save(genre)).thenReturn(Mono.just(genre));
         when(bookRepository.save(new Book("Discipline and Punish", author, genre)))
                 .thenReturn(Mono.just(book));
         when(bookRepository.findById(book.getTitle())).thenReturn(Mono.just(book));
