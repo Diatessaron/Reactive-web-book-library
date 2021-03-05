@@ -66,6 +66,7 @@ class BookServiceImplTest {
 
         when(authorRepository.findByName(author.getName())).thenReturn(Flux.just(author));
         when(genreRepository.findByName(genre.getName())).thenReturn(Mono.just(genre));
+        when(genreRepository.save(genre)).thenReturn(Mono.just(genre));
         when(bookRepository.save(book)).thenReturn(Mono.just(book));
         when(bookRepository.findByTitle(book.getTitle())).thenReturn(Flux.just(book));
 

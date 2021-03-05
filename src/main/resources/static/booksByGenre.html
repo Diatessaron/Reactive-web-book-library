@@ -49,9 +49,13 @@
             url: '/api/books/',
             method: 'delete',
             contentType: "application/json",
-            data: JSON.stringify({id: value})
+            data: JSON.stringify({id: value}),
+            complete: function(xhr, textStatus) {
+                if(xhr.status === 200){
+                    document.location.href = '/books'
+                }
+            }
         })
-        document.location.href = '/books'
     }
 
     $(function () {

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Author;
 import ru.otus.reactivewebbooklibrary.domain.Book;
 import ru.otus.reactivewebbooklibrary.domain.Comment;
@@ -13,6 +12,8 @@ import ru.otus.reactivewebbooklibrary.repository.AuthorRepository;
 import ru.otus.reactivewebbooklibrary.repository.BookRepository;
 import ru.otus.reactivewebbooklibrary.repository.CommentRepository;
 import ru.otus.reactivewebbooklibrary.repository.GenreRepository;
+
+import java.util.List;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -32,14 +33,12 @@ public class BookServiceImpl implements BookService {
     @Transactional
     @Override
     public Mono<Book> saveBook(String title, String authorNameParameter, String genreNameParameter) {
-        return getAuthor(authorNameParameter)
-                .flatMap(a -> {
-                    Book book = new Book();
-                    book = book.setTitle(title);
-                    return Mono.just(book.setAuthor(a));
-                })
-                .flatMap(b -> getGenre(genreNameParameter)
-                        .flatMap(g -> Mono.just(b.setGenre(g))))
+        Mono<Genre> genreMono = getGenre(genreNameParameter);
+
+        Mono<Author> authorMono = getAuthor(authorNameParameter);
+
+        return genreMono.zipWith(authorMono)
+                .map(t -> new Book(title, t.getT2(), t.getT1()))
                 .flatMap(bookRepository::save);
     }
 
@@ -86,22 +85,21 @@ public class BookServiceImpl implements BookService {
                                  String genreNameParameter) {
         final Mono<Book> bookMono = bookRepository.findById(id);
 
-        final Mono<Void> commentSave = bookMono.flatMap(b -> commentRepository.findByBook_Title(b.getTitle())
-                .map(c -> c.setBook(title))
-                .flatMap(commentRepository::save).then());
+        final Mono<List<Comment>> commentSave = bookMono.flatMap(b -> commentRepository.findByBook_Title(b.getTitle())
+                .map(c -> c.builder().setId(c.getId()).setContent(c.getContent()).setBook(title).build())
+                .flatMap(commentRepository::save).collectList());
 
-        return getGenre(genreNameParameter).zipWith(getAuthor(authorNameParameter))
-                .map(t -> bookMono.map(b -> b.setAuthor(t.getT2()))
-                        .map(b -> b.setGenre(t.getT1())))
-                .flatMap(b -> b.map(book -> book.setTitle(title)))
-                .flatMap(bookRepository::save).zipWith(commentSave).then();
+        return Mono.zip(bookMono, getGenre(genreNameParameter), getAuthor(authorNameParameter), commentSave)
+                .map(t -> t.getT1().builder().setId(t.getT1().getId()).setTitle(title)
+                        .setGenre(t.getT2()).setAuthor(t.getT3()).build())
+                .flatMap(bookRepository::save).then();
     }
 
     @Transactional
     @Override
     public Mono<Void> deleteBook(String id) {
         return bookRepository.findById(id).flatMap(b -> commentRepository.deleteByBook_Title(b.getTitle()))
-                .zipWith(bookRepository.deleteById(id)).then();
+                .then(bookRepository.deleteById(id));
     }
 
     private Mono<Author> getAuthor(String authorName) {

@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Book;
 import ru.otus.reactivewebbooklibrary.domain.Genre;
 import ru.otus.reactivewebbooklibrary.repository.BookRepository;
@@ -48,11 +47,12 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public Mono<Void> updateGenre(String id, String name) {
         final Flux<Book> bookSave = bookRepository.findByGenre_Id(id).map
-                (b -> b.setGenre(b.getGenre().setName(name)))
+                (b -> b.builder().setAuthor(b.getAuthor()).setGenre(b.getGenre().builder().setId(b.getGenre().getId())
+                        .setName(name).build()).setId(b.getId()).setTitle(b.getTitle()).build())
                 .flatMap(bookRepository::save);
 
-        final Mono<Genre> genreSave = genreRepository.findById(id).map(g -> g.setName(name))
-                .flatMap(genreRepository::save);
+        final Mono<Genre> genreSave = genreRepository.findById(id).map(g -> g.builder().setId(g.getId())
+                .setName(name).build()).flatMap(genreRepository::save);
 
         return bookSave.zipWith(genreSave).then();
     }
@@ -60,7 +60,6 @@ public class GenreServiceImpl implements GenreService {
     @Transactional
     @Override
     public Mono<Void> deleteGenre(String id) {
-        return bookRepository.deleteByGenre_Id(id)
-                .zipWith(genreRepository.deleteById(id)).then();
+        return bookRepository.deleteByGenre_Id(id).then(genreRepository.deleteById(id));
     }
 }

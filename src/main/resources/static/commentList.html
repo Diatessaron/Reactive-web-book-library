@@ -56,9 +56,13 @@
             url: '/api/comments',
             method: 'delete',
             contentType: "application/json",
-            data: JSON.stringify({id: value})
+            data: JSON.stringify({id: value}),
+            complete: function(xhr, textStatus) {
+                if(xhr.status === 200){
+                    window.location.reload()
+                }
+            }
         })
-        window.location.reload();
     }
 
     $(function () {

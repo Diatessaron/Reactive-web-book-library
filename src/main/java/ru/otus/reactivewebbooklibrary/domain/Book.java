@@ -3,6 +3,7 @@ package ru.otus.reactivewebbooklibrary.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ru.otus.reactivewebbooklibrary.domain.builder.BookBuilder;
 
 import java.util.Objects;
 
@@ -49,16 +50,8 @@ public class Book {
         return genre;
     }
 
-    public Book setTitle(String title) {
-        return new Book(this.id, title, this.author, this.genre);
-    }
-
-    public Book setAuthor(Author author) {
-        return new Book(this.id, this.title, author, this.genre);
-    }
-
-    public Book setGenre(Genre genre) {
-        return new Book(this.id, this.title, this.author, genre);
+    public BookBuilder builder() {
+        return new BookBuilder();
     }
 
     @Override

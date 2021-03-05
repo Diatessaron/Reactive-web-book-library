@@ -49,7 +49,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Mono<Comment> updateComment(String id, String commentContent) {
         return commentRepository.findById(id)
-                .flatMap(c -> Mono.just(c.setContent(commentContent)))
+                .flatMap(c -> Mono.just(c.builder().setId(c.getId()).setBook(c.getBook().getTitle())
+                        .setContent(commentContent).build()))
                 .flatMap(commentRepository::save);
     }
 

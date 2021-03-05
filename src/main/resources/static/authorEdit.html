@@ -44,9 +44,13 @@
             url: '/api/authors',
             method: 'put',
             contentType: "application/json",
-            data: JSON.stringify({id: id, author: value})
+            data: JSON.stringify({id: id, author: value}),
+            complete: function(xhr, textStatus) {
+                if(xhr.status === 200){
+                    document.location.href = '/authors'
+                }
+            }
         })
-        document.location.href = '/authors'
     }
 </script>
 

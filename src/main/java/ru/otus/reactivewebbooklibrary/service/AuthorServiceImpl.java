@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import ru.otus.reactivewebbooklibrary.domain.Author;
 import ru.otus.reactivewebbooklibrary.domain.Book;
 import ru.otus.reactivewebbooklibrary.repository.AuthorRepository;
@@ -48,11 +47,12 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public Mono<Void> updateAuthor(String id, String name) {
         final Flux<Book> bookSave = bookRepository.findByAuthor_Id(id).map
-                (b -> b.setAuthor(b.getAuthor().setName(name)))
+                (b -> b.builder().setId(b.getId()).setTitle(b.getTitle()).setGenre(b.getGenre())
+                        .setAuthor(b.getAuthor().builder().setId(b.getAuthor().getId()).setName(name).build()).build())
                 .flatMap(bookRepository::save);
 
-        final Mono<Author> authorSave = authorRepository.findById(id).map(a -> a.setName(name))
-                .flatMap(authorRepository::save);
+        final Mono<Author> authorSave = authorRepository.findById(id).map(a -> a.builder().setId(a.getId())
+                .setName(name).build()).flatMap(authorRepository::save);
 
         return bookSave.zipWith(authorSave).then();
     }
@@ -60,7 +60,6 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional
     @Override
     public Mono<Void> deleteAuthor(String id) {
-        return bookRepository.deleteByAuthor_Id(id)
-                .zipWith(authorRepository.deleteById(id)).then();
+        return bookRepository.deleteByAuthor_Id(id).then(authorRepository.deleteById(id));
     }
 }

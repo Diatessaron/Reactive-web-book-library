@@ -3,6 +3,7 @@ package ru.otus.reactivewebbooklibrary.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ru.otus.reactivewebbooklibrary.domain.builder.GenreBuilder;
 
 import java.util.Objects;
 
@@ -33,8 +34,8 @@ public class Genre {
         return name;
     }
 
-    public Genre setName(String name) {
-        return new Genre(this.id, name);
+    public GenreBuilder builder() {
+        return new GenreBuilder();
     }
 
     @Override

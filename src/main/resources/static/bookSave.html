@@ -71,9 +71,13 @@
             url: '/api/books',
             method: 'post',
             contentType: "application/json",
-            data: JSON.stringify({title: title, authorName: author, genreName: genre})
+            data: JSON.stringify({title: title, authorName: author, genreName: genre}),
+            complete: function(xhr, textStatus) {
+                if(xhr.status === 200){
+                    document.location.href = '/books'
+                }
+            }
         })
-        document.location.href = '/books'
     }
 </script>
 

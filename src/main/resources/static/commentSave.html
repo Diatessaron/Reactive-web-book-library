@@ -50,9 +50,13 @@
             url: '/api/comments',
             method: 'post',
             contentType: "application/json",
-            data: JSON.stringify({content: content, book: book})
+            data: JSON.stringify({content: content, book: book}),
+            complete: function(xhr, textStatus) {
+                if(xhr.status === 200){
+                    document.location.href = '/comments'
+                }
+            }
         })
-        document.location.href = '/comments'
     }
 </script>
 

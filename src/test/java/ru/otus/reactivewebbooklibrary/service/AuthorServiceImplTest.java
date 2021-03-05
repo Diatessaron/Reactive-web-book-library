@@ -13,7 +13,6 @@ import ru.otus.reactivewebbooklibrary.domain.Genre;
 import ru.otus.reactivewebbooklibrary.repository.AuthorRepository;
 import ru.otus.reactivewebbooklibrary.repository.BookRepository;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
@@ -66,7 +65,8 @@ class AuthorServiceImplTest {
         when(authorRepository.findById(jamesJoyce.getId())).thenReturn(Mono.just(jamesJoyce));
         when(authorRepository.save(author)).thenReturn(Mono.just(author));
         when(bookRepository.findByAuthor_Id(jamesJoyce.getId())).thenReturn(Flux.just(book));
-        when(bookRepository.save(book.setAuthor(author))).thenReturn(Mono.just(book.setAuthor(author)));
+        when(bookRepository.save(book.builder().setId(book.getId()).setGenre(book.getGenre()).setTitle(book.getTitle())
+                .setAuthor(author).build())).thenReturn(Mono.just(book.builder().setAuthor(author).build()));
 
         service.updateAuthor(jamesJoyce.getId(), author.getName()).block();
 

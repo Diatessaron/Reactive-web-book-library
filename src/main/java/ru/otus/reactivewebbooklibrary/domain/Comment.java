@@ -3,6 +3,7 @@ package ru.otus.reactivewebbooklibrary.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ru.otus.reactivewebbooklibrary.domain.builder.CommentBuilder;
 
 import java.util.Objects;
 
@@ -21,14 +22,14 @@ public class Comment {
     public Comment(String content, String bookTitle) {
         this.content = content;
         this.book = new Book();
-        this.book = this.book.setTitle(bookTitle);
+        this.book = this.book.builder().setTitle(bookTitle).build();
     }
 
     public Comment(String id, String content, String bookTitle) {
         this.id = id;
         this.content = content;
         this.book = new Book();
-        this.book = this.book.setTitle(bookTitle);
+        this.book = this.book.builder().setTitle(bookTitle).build();
     }
 
     public String getId() {
@@ -43,12 +44,8 @@ public class Comment {
         return book;
     }
 
-    public Comment setContent(String content) {
-        return new Comment(this.id, content, this.book.getTitle());
-    }
-
-    public Comment setBook(String bookTitle) {
-        return new Comment(this.id, this.content, bookTitle);
+    public CommentBuilder builder() {
+        return new CommentBuilder();
     }
 
     @Override

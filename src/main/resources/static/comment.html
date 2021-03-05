@@ -41,6 +41,7 @@
 
 <script>
     const comment = window.location.href.substring(window.location.href.lastIndexOf('=') + 1)
+
     $(function () {
         $.get('/api/comments/id?id=' + comment).done(function (comment) {
             $('tbody').append(`
@@ -66,9 +67,13 @@
                     url: '/api/comments/',
                     method: 'delete',
                     contentType: "application/json",
-                    data: JSON.stringify({id: value})
+                    data: JSON.stringify({id: value}),
+                    complete: function(xhr, textStatus) {
+                        if(xhr.status === 200){
+                            document.location.href = '/comments'
+                        }
+                    }
                 })
-                document.location.href = '/comments'
             }
         });
     });
