@@ -3,6 +3,7 @@ package ru.otus.reactivewebbooklibrary.domain;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ru.otus.reactivewebbooklibrary.domain.builder.AuthorBuilder;
 
 import java.util.Objects;
 
@@ -13,7 +14,6 @@ public class Author {
     @Field("name")
     private String name;
 
-    //TODO: Check for necessity
     public Author() {
     }
 
@@ -34,13 +34,8 @@ public class Author {
         return name;
     }
 
-    //TODO: Check for necessity
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Author setName(String name) {
-        return new Author(this.id, name);
+    public AuthorBuilder builder() {
+        return new AuthorBuilder();
     }
 
     @Override
